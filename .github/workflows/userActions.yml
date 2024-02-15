@@ -1,0 +1,43 @@
+name: Integration Test for User APIs
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Run integration tests for users
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Start postgres
+        run: sudo systemctl start postgresql
+      - name: Create user
+        run: sudo -u postgres psql -c "CREATE USER ${{ secrets.POSTGRES_USER }} WITH PASSWORD '${{ secrets.POSTGRES_PASSWORD }}';"
+      - name: Create database
+        run: sudo -u postgres createdb ${{ secrets.POSTGRES_DB }} --owner=${{ secrets.POSTGRES_USER }}
+      - name: Granting new user all the previleges
+        run: sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${{ secrets.POSTGRES_DB }} TO ${{ secrets.POSTGRES_USER }};"
+      - name: Restarting postgresql
+        run: sudo systemctl restart postgresql
+      - name: Use Node.Js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "npm"
+      - name: Install dependencies
+        run: npm install
+      - name: Run Test
+        run: npm test
+        env:
+          PORT: ${{ secrets.ENV_PORT }}
+          DB_NAME: ${{ secrets.POSTGRES_DB }}
+          DB_USER: ${{ secrets.POSTGRES_USER }}
+          DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          HOST: localhost
+          DIALECT: postgres
