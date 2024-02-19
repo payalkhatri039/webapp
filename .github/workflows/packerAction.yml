@@ -1,0 +1,49 @@
+name: Packer Continuous Integration Actions For Status Check
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+    branches:
+      - main
+
+jobs:
+  packer_template_validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@main
+
+      - name: Create Zip File of Webapp Repo
+        run: |
+          zip -r webapp.zip .
+
+      - name: Move Zip to Workflows Directory
+        run: mv webapp.zip vm-image/
+
+      - name: Format Packer Configs
+        run: |
+          cd vm-image/
+          if packer fmt -check -recursive -diff gcpBuild.pkr.hcl; then
+            echo "No formatting changes detected"
+            echo "::set-output name=changed::false"
+          else
+            echo "Formatting changes detected"
+            echo "::set-output name=changed::true"
+            exit 1
+          fi
+          echo "Formatting check complete"
+
+      - name: Check if formatting changed files
+        if: steps.format.outputs.changed == 'true'
+        run: exit 1
+
+      - name: Init and Validate Packer Configs
+        run: |
+          cd vm-image/
+          packer init gcpBuild.pkr.hcl
+          packer validate gcpBuild.pkr.hcl
