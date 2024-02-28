@@ -1,6 +1,5 @@
 [Unit]
 Description=CSYE 6225 Cloud WebApp App 
-ConditionPathExists=/home/Cloud/webapp/.env
 After=network.target
 
 [Service]
@@ -8,6 +7,7 @@ Type=simple
 User=csye6225
 Group=csye6225
 WorkingDirectory=/home/Cloud/webapp
+ExecStartPre=/bin/bash -c 'while [ ! -f "/home/Cloud/webapp/.env" ]; do sleep 5; echo ".env file not found. Waiting..."; done'
 ExecStart=/usr/bin/node server/server.js
 Restart=always
 RestartSec=3
