@@ -32,41 +32,10 @@ variable "disk_size" {
   default = env("DISK_SIZE")
 }
 
-
-# variable "db_name" {
-#   type    = string
-#   default = env("DB_NAME")
-# }
-
-# variable "db_user" {
-#   type    = string
-#   default = env("DB_USER")
-# }
-
-# variable "db_password" {
-#   type    = string
-#   default = env("DB_PASSWORD")
-# }
-
 variable "ssh_username" {
   type    = string
   default = env("SSH_USERNAME")
 }
-
-# variable "port" {
-#   type    = number
-#   default = env("PORT")
-# }
-
-# variable "host" {
-#   type    = string
-#   default = env("HOST")
-# }
-
-# variable "dialect" {
-#   type    = string
-#   default = env("DIALECT")
-# }
 
 source "googlecompute" "csye6225-app-custom-image" {
   project_id              = var.project_id
@@ -87,15 +56,9 @@ build {
   ]
 
   provisioner "shell" {
-    # environment_vars = ["DB_NAME=${var.db_name}",
-    #   "DB_USER=${var.db_user}",
-    # "DB_PASSWORD=${var.db_password}"]
-
     scripts = [
-      # "./update.sh",
+      "./update.sh",
       "./envSetup.sh",
-      # "./dbSetup.sh",
-
     ]
   }
 
@@ -110,12 +73,6 @@ build {
   }
 
   provisioner "shell" {
-    # environment_vars = ["DB_NAME=${var.db_name}",
-    #   "DB_USER=${var.db_user}",
-    #   "DB_PASSWORD=${var.db_password}",
-    #   "PORT= ${var.port}",
-    #   "HOST=${var.host}",
-    # "DIALECT=${var.dialect}"]
 
     scripts = [
       "./unzip.sh",
@@ -123,6 +80,4 @@ build {
       "./systemD/systemdSetup.sh"
     ]
   }
-
-
 }
