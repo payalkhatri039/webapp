@@ -71,13 +71,19 @@ build {
     source      = "./systemD/systemdService.service"
     destination = "/tmp/"
   }
+  
+  provisioner "file" {
+    source      = "./logConfig.yaml"
+    destination = "/etc/google-cloud-ops-agent/"
+  }
 
   provisioner "shell" {
 
     scripts = [
       "./unzip.sh",
       "./setDependencies.sh",
-      "./systemD/systemdSetup.sh"
+      "./systemD/systemdSetup.sh",
+      "./agentOps.sh"
     ]
   }
 }
