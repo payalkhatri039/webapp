@@ -71,10 +71,10 @@ build {
     source      = "./systemD/systemdService.service"
     destination = "/tmp/"
   }
-  
+
   provisioner "file" {
-    source      = "./logConfig.yaml"
-    destination = "/etc/google-cloud-ops-agent/"
+    source      = "./config.yaml"
+    destination = "/tmp/"
   }
 
   provisioner "shell" {
