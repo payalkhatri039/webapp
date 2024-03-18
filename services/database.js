@@ -18,6 +18,7 @@ export const connection = async () => {
     await sequelizeInstance.authenticate();
     return true;
   } catch (error) {
+    logger.error('Database connection failed');
     return false;
   }
 };
