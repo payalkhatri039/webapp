@@ -2,6 +2,8 @@
 
 sudo mkdir -p /var/logs/webapp_logs
 
+cd /var/logs/ || exit
+
 sudo chown csye6225:csye6225 webapp_logs -R 
 
 curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
