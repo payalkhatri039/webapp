@@ -1,8 +1,10 @@
 #!/bin/bash
 
-sudo mkdir -p /var/logs/webapp_logs
+sudo mkdir -p /var/log/webapp_logs
 
-cd /var/logs/ || exit
+cd /var/log/ || exit
+
+sudo touch /var/log/webapp_logs/webappLog.log
 
 sudo chown csye6225:csye6225 webapp_logs -R 
 
