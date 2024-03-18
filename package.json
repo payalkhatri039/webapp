@@ -1,7 +1,7 @@
 {
   "name": "webapp",
   "version": "1.0.0",
-  "description": "CSYE 6225 Assignment 2",
+  "description": "CSYE 6225 Assignment 6",
   "main": "app.js",
   "type": "module",
   "scripts": {
