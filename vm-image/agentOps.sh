@@ -6,6 +6,8 @@ cd /var/logs/ || exit
 
 sudo chown csye6225:csye6225 webapp_logs -R 
 
+cd /home || exit
+
 curl -sSO https://dl.google.com/cloudagents/add-google-cloud-ops-agent-repo.sh
 
 sudo bash add-google-cloud-ops-agent-repo.sh --also-install
