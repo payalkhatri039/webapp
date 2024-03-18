@@ -57,7 +57,7 @@ build {
 
   provisioner "shell" {
     scripts = [
-      "./update.sh",
+      # "./update.sh",
       "./envSetup.sh",
     ]
   }
