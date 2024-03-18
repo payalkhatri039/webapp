@@ -16,7 +16,6 @@ sudo cp /tmp/config.yaml /etc/google-cloud-ops-agent/
 
 sudo systemctl restart google-cloud-ops-agent
 
-sleep 10m
 
 
 
