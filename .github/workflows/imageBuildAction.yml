@@ -24,7 +24,7 @@ jobs:
       SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
       DISK_SIZE: ${{ vars.DISK_SIZE}}
       DISK_TYPE: ${{ vars.DISK_TYPE }}
-
+      NODE_ENV: DEV
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4

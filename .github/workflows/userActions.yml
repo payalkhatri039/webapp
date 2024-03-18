@@ -42,3 +42,4 @@ jobs:
           DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
           HOST: localhost
           DIALECT: postgres
+          NODE_ENV: DEV
