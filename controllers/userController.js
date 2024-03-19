@@ -5,7 +5,6 @@ import { userSchema } from "./schema/userSchema.js";
 import { userUpdateSchema } from "./schema/userUpdateSchema.js";
 import { validate } from "jsonschema";
 import logger from "../modules/winstonLogger.js";
-import { log } from "winston";
 
 export const createUser = async (request, response) => {
   const dbConnection = await connection();
