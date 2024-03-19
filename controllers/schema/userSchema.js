@@ -4,15 +4,19 @@ export const userSchema = {
   properties: {
     firstName: {
       type: "string",
+      minlength: 1,
     },
     lastName: {
       type: "string",
+      minlength: 1,
     },
     username: {
       type: "string",
+      minlength: 1,
     },
     password: {
       type: "string",
+      minlength: 1,
     },
   },
   required: ["firstName", "lastName", "username", "password"],
