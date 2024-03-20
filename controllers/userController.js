@@ -7,6 +7,7 @@ import { validate } from "jsonschema";
 import logger from "../modules/winstonLogger.js";
 
 export const createUser = async (request, response) => {
+  logger.debug("Checking database connection");
   const dbConnection = await connection();
 
   //Service unavailable if database is not connected
@@ -71,6 +72,7 @@ export const createUser = async (request, response) => {
 };
 
 export const authorizeAndGetUser = async (request, response) => {
+  logger.debug("Checking database connection");
   const dbConnection = await connection();
   //Service unavailable if database is not connected
   if (!dbConnection) {
@@ -146,6 +148,7 @@ export const authorizeAndGetUser = async (request, response) => {
 
 export const updateUser = async (request, response) => {
   //Service unavailable if database is not connected
+  logger.debug("Checking database connection");
   const dbConnection = await connection();
   if (!dbConnection) {
     logger.error("Error: Database not connected");
