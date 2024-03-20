@@ -254,7 +254,7 @@ export const userHeadOptions = async (request, response) => {
 
 //wrong routes
 export const userOtherRoutes = (request, response) => {
-  logger.debug("Wrong route given in URL");
+  logger.error("Wrong route given in URL");
   response.status(404).send();
 };
 
