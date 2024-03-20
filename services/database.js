@@ -15,11 +15,9 @@ export const sequelizeInstance = new Sequelize(
 
 export const connection = async () => {
   try {
-    logger.debug("Checking database connection");
     await sequelizeInstance.authenticate();
     return true;
   } catch (error) {
-    logger.error('Database connection failed');
     return false;
   }
 };
