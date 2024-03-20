@@ -7,9 +7,14 @@ const logger = winston.createLogger({
       ? [
           new winston.transports.File({
             filename: "/var/log/webapp_logs/webappLog.log",
+            level: "debug", // Setting logging level to include debug logs
           }),
         ]
-      : [new winston.transports.Console()],
+      : [
+          new winston.transports.Console({
+            level: "debug",
+          }),
+        ],
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json()
