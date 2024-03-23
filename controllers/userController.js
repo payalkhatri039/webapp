@@ -5,6 +5,8 @@ import { userSchema } from "./schema/userSchema.js";
 import { userUpdateSchema } from "./schema/userUpdateSchema.js";
 import { validate } from "jsonschema";
 import logger from "../modules/winstonLogger.js";
+import { publishMessage } from "../pub-sub/pubSubConfig.js";
+const topicName = "verify_email";
 
 export const createUser = async (request, response) => {
   logger.debug("Checking database connection");
@@ -63,6 +65,7 @@ export const createUser = async (request, response) => {
         account_updated: newUser.updatedAt.toISOString(),
       };
       logger.info("New user created");
+      let messageId = await publishMessage(topicName, responseObject);
       response.status(201).json(responseObject).send();
     } catch (error) {
       logger.error(error);
