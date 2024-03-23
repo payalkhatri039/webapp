@@ -19,10 +19,12 @@
   },
   "homepage": "https://github.com/payalkhatri039/webapp#readme",
   "dependencies": {
+    "@google-cloud/pubsub": "^4.3.3",
     "cors": "^2.8.5",
     "dotenv": "^16.4.1",
-    "express": "^4.18.2",
+    "express": "^4.19.1",
     "jsonschema": "^1.4.1",
+    "path": "^0.12.7",
     "pg": "^8.11.3",
     "pg-hstore": "^2.3.4",
     "sequelize": "^6.36.0",
