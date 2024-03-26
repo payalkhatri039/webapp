@@ -32,6 +32,10 @@ const User = sequelizeInstance.define("user", {
     type: DataTypes.STRING,
     defaultValue: literal("CURRENT_TIMESTAMP"),
   },
+  verified: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false,
+  },
 });
 
 export const syncDb = async () => {

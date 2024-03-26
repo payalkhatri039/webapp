@@ -8,6 +8,8 @@ router
   .head(userController.userHeadOptions)
   .all(userController.userAllMethods);
 
+router.route("/verifyUser").get(userController.verifyUser);
+
 router
   .route("/self")
   .get(userController.authorizeAndGetUser)
