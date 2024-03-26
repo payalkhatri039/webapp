@@ -69,7 +69,6 @@ export const createUser = async (request, response) => {
       logger.info("New user created");
       let messageId = await publishMessage(topicName, responseObject);
       response.status(201).json(responseObject).send();
-
     } catch (error) {
       logger.error(error);
       response.status(400).send();
@@ -269,6 +268,7 @@ export const updateUser = async (request, response) => {
 
 export const verifyUser = async (request, response) => {
   try {
+    logger.info("Verfying user");
     const token = request.query.token;
     const userVerificationDetail = await UserVerification.findOne({
       where: { id: token },
@@ -298,15 +298,18 @@ export const verifyUser = async (request, response) => {
         const updateUser = {};
         updateUser.verified = true;
         const updatedUser = await existingUser.update(updateUser);
-        return response.status(200).send("User Verified");
+        logger.info("User verfied");
+        response.send("User verfied");
+        return;
+      } else {
+        logger.error("Link has expired");
+        response.send("Link has expired");
+        return;
       }
-    } else {
-      logger.error("Link has expired");
-      return response.status(400).send("Link expired");
     }
   } catch (error) {
     logger.error("Error processing verification:", error);
-    res.status(500).send("Internal server error");
+    response.send("Internal server error");
   }
 };
 

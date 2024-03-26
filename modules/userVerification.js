@@ -16,7 +16,7 @@ const UserVerification = sequelizeInstance.define(
       validate: { isEmail: true },
     },
     verifyLinkTimestamp: {
-      type: DataTypes.STRING,
+      type: DataTypes.DATE,
       allowNull: false,
     },
   },
