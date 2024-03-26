@@ -1,5 +1,6 @@
 import { sequelizeInstance } from "../services/database.js";
 import { DataTypes, literal } from "sequelize";
+import logger from "./winstonLogger.js";
 
 const User = sequelizeInstance.define("user", {
   id: {
@@ -41,8 +42,10 @@ const User = sequelizeInstance.define("user", {
 export const syncDb = async () => {
   try {
     await User.sync();
+    logger.info(" Users table synced");
+
   } catch (err) {
-    console.log("not able to sync the table", err);
+    logger.error("not able to sync users table");
   }
 };
 

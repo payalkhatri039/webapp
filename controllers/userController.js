@@ -21,7 +21,7 @@ export const createUser = async (request, response) => {
   } else {
     if (Object.keys(request.query).length != 0) {
       //Bad request since api has query params
-      loggger.info("Head options method not allowed hence 405 response")
+      logger.info("Head options method not allowed hence 405 response");
       response.status(400).send();
       return;
     }
@@ -65,12 +65,11 @@ export const createUser = async (request, response) => {
         account_created: newUser.createdAt.toISOString(),
         account_updated: newUser.updatedAt.toISOString(),
       };
+
       logger.info("New user created");
       let messageId = await publishMessage(topicName, responseObject);
-      const verifyUser = await User.findOne({
-        where: { username: request.body.username },
-      });
       response.status(201).json(responseObject).send();
+
     } catch (error) {
       logger.error(error);
       response.status(400).send();
@@ -106,7 +105,9 @@ export const authorizeAndGetUser = async (request, response) => {
         Object.keys(request.query).length != 0
       ) {
         //Bad request since api is sending a body or has query params
-        logger.warn('Bad request: invalid content-type or request body/query params present');
+        logger.warn(
+          "Bad request: invalid content-type or request body/query params present"
+        );
         response.status(400).send();
         return;
       }
@@ -127,8 +128,7 @@ export const authorizeAndGetUser = async (request, response) => {
         response.status(401).send();
         return;
       }
-      if(!existingUser.verified)
-      {
+      if (!existingUser.verified) {
         logger.error("User is not verified");
         response.status(401).send();
         return;
@@ -138,7 +138,7 @@ export const authorizeAndGetUser = async (request, response) => {
         existingUser.password
       );
       if (!comparePasswords) {
-        logger.error("Error: Wrong password")
+        logger.error("Error: Wrong password");
         response.status(401).send();
         return;
       }
@@ -152,7 +152,7 @@ export const authorizeAndGetUser = async (request, response) => {
       };
       logger.info("Authorized user");
       response.status(200).json(responseObject).send();
-    } catch(error) {
+    } catch (error) {
       logger.error(error);
       response.status(400).send();
     }
@@ -201,8 +201,7 @@ export const updateUser = async (request, response) => {
         response.status(401).send();
         return;
       }
-      if(!existingUser.verified)
-      {
+      if (!existingUser.verified) {
         logger.error("User is not verified");
         response.status(401).send();
         return;
@@ -214,7 +213,7 @@ export const updateUser = async (request, response) => {
 
       //Unauthorzied if wrong password provided
       if (!comparePasswords) {
-        logger.error("Error: Wrong password")
+        logger.error("Error: Wrong password");
         response.status(401).send();
         return;
       }
@@ -261,58 +260,55 @@ export const updateUser = async (request, response) => {
         response.status(400).send();
         return;
       }
-    } catch(error) {
+    } catch (error) {
       logger.error(error);
       response.status(400).send();
     }
   }
 };
 
-export const verifyUser = async(request, response) => {
-try {
-  const username = request.query.username;
-  const existingUser = await User.findOne({
-    where: { username: username },
-  });
+export const verifyUser = async (request, response) => {
+  try {
+    const token = request.query.token;
+    const userVerificationDetail = await UserVerification.findOne({
+      where: { id: token },
+    });
+    const existingUser = await User.findOne({
+      where: { username: userVerificationDetail?.username },
+    });
 
-  //Unauthorzied if user is not existing
-  if (!existingUser) {
-    logger.error("Error: User does not exist");
-    response.status(401).send();
-    return;
-  }
-
-  else if(existingUser.verified ==true)
-  {
-    logger.error("Bad Request: User is already verified");
-    response.status(400).send();
-    return;
-  }
-  // Verify the link
-  const userVerificationDetail = await UserVerification.findOne({ where: { username: username } });
-  if (userVerificationDetail?.verifyLinkTimestamp) {
+    //Unauthorzied if user is not existing
+    if (!existingUser) {
+      logger.error("Error: User does not exist");
+      response.status(401).send();
+      return;
+    } else if (existingUser.verified == true) {
+      logger.error("Bad Request: User is already verified");
+      response.status(400).send();
+      return;
+    }
+    // Verify the link
+    if (userVerificationDetail?.verifyLinkTimestamp) {
       const currentTime = new Date();
       const linkSentTime = userVerificationDetail.verifyLinkTimestamp;
       const differenceInMilliseconds = currentTime - linkSentTime;
       // Convert milliseconds to seconds
-      const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000); 
-     if(differenceInSeconds<=120)
-     {
-      const updateUser ={};
-      updateUser.verified=true;
-      const updatedUser = await existingUser.update(updateUser);
-      return response.status(200).send("User Verified");
-     }
-  } else {
+      const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
+      if (differenceInSeconds <= 120) {
+        const updateUser = {};
+        updateUser.verified = true;
+        const updatedUser = await existingUser.update(updateUser);
+        return response.status(200).send("User Verified");
+      }
+    } else {
       logger.error("Link has expired");
       return response.status(400).send("Link expired");
-  } 
-
-} catch (error) {
-  logger.error("Error processing verification:", error);
-  res.status(500).send("Internal server error");
-}
-}
+    }
+  } catch (error) {
+    logger.error("Error processing verification:", error);
+    res.status(500).send("Internal server error");
+  }
+};
 
 //Head method not allowed
 export const userHeadOptions = async (request, response) => {
