@@ -2,9 +2,11 @@ import express from "express";
 import { config } from "dotenv";
 import router from "./routes/index.js";
 import { syncDb } from "./modules/user.js";
+import {syncUserVerificationDb} from "./modules/userVerification.js";
 
 config();
 syncDb();
+syncUserVerificationDb();
 export const app = express();
 
 app.use(express.json());

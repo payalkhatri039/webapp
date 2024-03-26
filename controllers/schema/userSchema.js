@@ -18,6 +18,9 @@ export const userSchema = {
       type: "string",
       minlength: 1,
     },
+    verified: {
+      type: "boolean",
+    }
   },
   required: ["firstName", "lastName", "username", "password"],
   additionalProperties: false,

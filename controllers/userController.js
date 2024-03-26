@@ -6,6 +6,7 @@ import { userUpdateSchema } from "./schema/userUpdateSchema.js";
 import { validate } from "jsonschema";
 import logger from "../modules/winstonLogger.js";
 import { publishMessage } from "../pub-sub/pubSubConfig.js";
+import UserVerification from "../modules/userVerification.js";
 const topicName = "verify_email";
 
 export const createUser = async (request, response) => {
@@ -66,6 +67,9 @@ export const createUser = async (request, response) => {
       };
       logger.info("New user created");
       let messageId = await publishMessage(topicName, responseObject);
+      const verifyUser = await User.findOne({
+        where: { username: request.body.username },
+      });
       response.status(201).json(responseObject).send();
     } catch (error) {
       logger.error(error);
@@ -123,6 +127,12 @@ export const authorizeAndGetUser = async (request, response) => {
         response.status(401).send();
         return;
       }
+      if(!existingUser.verified)
+      {
+        logger.error("User is not verified");
+        response.status(401).send();
+        return;
+      }
       const comparePasswords = await encryptFunction.comparePasswords(
         password,
         existingUser.password
@@ -161,7 +171,7 @@ export const updateUser = async (request, response) => {
     try {
       if (Object.keys(request.query).length != 0) {
         //Bad request since api has query params
-        loggger.info("Bad Request: Head options method/Params not allowed");
+        logger.info("Bad Request: Head options method/Params not allowed");
         response.status(400).send();
         return;
       }
@@ -188,6 +198,12 @@ export const updateUser = async (request, response) => {
       //Unauthorzied if user is not existing
       if (!existingUser) {
         logger.error("Error: User does not exist");
+        response.status(401).send();
+        return;
+      }
+      if(!existingUser.verified)
+      {
+        logger.error("User is not verified");
         response.status(401).send();
         return;
       }
@@ -251,6 +267,52 @@ export const updateUser = async (request, response) => {
     }
   }
 };
+
+export const verifyUser = async(request, response) => {
+try {
+  const username = request.query.username;
+  const existingUser = await User.findOne({
+    where: { username: username },
+  });
+
+  //Unauthorzied if user is not existing
+  if (!existingUser) {
+    logger.error("Error: User does not exist");
+    response.status(401).send();
+    return;
+  }
+
+  else if(existingUser.verified ==true)
+  {
+    logger.error("Bad Request: User is already verified");
+    response.status(400).send();
+    return;
+  }
+  // Verify the link
+  const userVerificationDetail = await UserVerification.findOne({ where: { username: username } });
+  if (userVerificationDetail?.verifyLinkTimestamp) {
+      const currentTime = new Date();
+      const linkSentTime = userVerificationDetail.verifyLinkTimestamp;
+      const differenceInMilliseconds = currentTime - linkSentTime;
+      // Convert milliseconds to seconds
+      const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000); 
+     if(differenceInSeconds<=120)
+     {
+      const updateUser ={};
+      updateUser.verified=true;
+      const updatedUser = await existingUser.update(updateUser);
+      return response.status(200).send("User Verified");
+     }
+  } else {
+      logger.error("Link has expired");
+      return response.status(400).send("Link expired");
+  } 
+
+} catch (error) {
+  logger.error("Error processing verification:", error);
+  res.status(500).send("Internal server error");
+}
+}
 
 //Head method not allowed
 export const userHeadOptions = async (request, response) => {
