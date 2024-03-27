@@ -43,3 +43,4 @@ jobs:
           HOST: localhost
           DIALECT: postgres
           NODE_ENV: DEV
+          LINK_EXPIRATION_TIME: ${{vars.LINK_EXPIRATION_TIME}}
