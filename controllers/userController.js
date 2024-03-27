@@ -67,7 +67,9 @@ export const createUser = async (request, response) => {
       };
 
       logger.info("New user created");
+      if( process.env.NODE_ENV == "PROD"){
       let messageId = await publishMessage(topicName, responseObject);
+      }
       response.status(201).json(responseObject).send();
     } catch (error) {
       logger.error(error);
@@ -127,9 +129,9 @@ export const authorizeAndGetUser = async (request, response) => {
         response.status(401).send();
         return;
       }
-      if (!existingUser.verified) {
+      if (process.env.NODE_ENV == "PROD" && !existingUser.verified) {
         logger.error("User is not verified");
-        response.status(401).send();
+        response.status(403).send();
         return;
       }
       const comparePasswords = await encryptFunction.comparePasswords(
@@ -141,6 +143,7 @@ export const authorizeAndGetUser = async (request, response) => {
         response.status(401).send();
         return;
       }
+      logger.info("Authorized user");
       const responseObject = {
         id: existingUser.id,
         first_name: existingUser.firstName,
@@ -149,7 +152,7 @@ export const authorizeAndGetUser = async (request, response) => {
         account_created: existingUser.createdAt.toISOString(),
         account_updated: existingUser.updatedAt.toISOString(),
       };
-      logger.info("Authorized user");
+      logger.info("Retreived user information");
       response.status(200).json(responseObject).send();
     } catch (error) {
       logger.error(error);
@@ -200,7 +203,7 @@ export const updateUser = async (request, response) => {
         response.status(401).send();
         return;
       }
-      if (!existingUser.verified) {
+      if (process.env.NODE_ENV == "PROD" && !existingUser.verified) {
         logger.error("User is not verified");
         response.status(401).send();
         return;
@@ -294,7 +297,7 @@ export const verifyUser = async (request, response) => {
       const differenceInMilliseconds = currentTime - linkSentTime;
       // Convert milliseconds to seconds
       const differenceInSeconds = Math.floor(differenceInMilliseconds / 1000);
-      if (differenceInSeconds <= 120) {
+      if (differenceInSeconds <= process.env.LINK_EXPIRATION_TIME) {
         const updateUser = {};
         updateUser.verified = true;
         const updatedUser = await existingUser.update(updateUser);

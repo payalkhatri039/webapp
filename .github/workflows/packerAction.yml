@@ -18,6 +18,7 @@ jobs:
       DB_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
       HOST: ${{ vars.HOST}}
       DIALECT: ${{vars.DIALECT}}
+      LINK_EXPIRATION_TIME: ${{vars.LINK_EXPIRATION_TIME}}
       PROJECT_ID: ${{ secrets.PROJECT_ID }}
       ZONE: ${{vars.ZONE}}
       SOURCE_IMAGE_FAMILY: ${{ vars.SOURCE_IMAGE_FAMILY }}
