@@ -205,7 +205,7 @@ export const updateUser = async (request, response) => {
       }
       if (process.env.NODE_ENV == "PROD" && !existingUser.verified) {
         logger.error("User is not verified");
-        response.status(401).send();
+        response.status(403).send();
         return;
       }
       const comparePasswords = await encryptFunction.comparePasswords(
