@@ -3,13 +3,14 @@ name: Integration Actions to Build Custom Image
 on:
   pull_request:
     types:
-      - closed
+      - opened
+      - synchronize
     branches:
       - main
 
 jobs:
   action_on_pull_request_merge:
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     env:
       PORT: ${{ secrets.ENV_PORT }}
@@ -55,4 +56,10 @@ jobs:
         run: |
           cd vm-image/
           packer init gcpBuild.pkr.hcl
-          packer build gcpBuild.pkr.hcl
+          IMAGE_ID=$(packer build -machine-readable gcpBuild.pkr.hcl | awk -F, '$0 ~/artifact,0,id/ {print $6}')
+          echo "IMAGE_ID = $IMAGE_ID"
+
+      - name: Verify the created image id using gcloud
+        run: gcloud compute images list
+
+
