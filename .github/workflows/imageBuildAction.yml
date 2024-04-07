@@ -59,7 +59,20 @@ jobs:
           IMAGE_ID=$(packer build -machine-readable gcpBuild.pkr.hcl | awk -F, '$0 ~/artifact,0,id/ {print $6}')
           echo "IMAGE_ID = $IMAGE_ID"
 
-      - name: Verify the created image id using gcloud
-        run: gcloud compute images list
+      - name: Create new Instance Template version
+        run: |
+          TEMPLATE_NAME="web_instance_template-$(uuidgen)"
+          gcloud beta compute instance-templates create web-instance-$TEMPLATE_NAME --project=csye6225-a03 --description=This\ template\ is\ used\ to\ create\ web\ instances\ depending\ on\ the\ load --machine-type=e2-standard-2 --network-interface=network-tier=STANDARD,subnet=webapp --instance-template-region=projects/csye6225-a03/regions/us-east4 --metadata=startup-script=\#\!/bin/bash$'\n'$'\n'cd\ /home/Cloud/webapp/\ \|\|\ exit$'\n'$'\n'env_values=\$\(cat\ \<\<EOF$'\n'PORT=3001$'\n'DB_NAME=webapp$'\n'DB_USER=webapp$'\n'DB_PASSWORD=ewpnkOJ8KqVZlFiN$'\n'HOST=10.188.112.2$'\n'DIALECT=postgres$'\n'NODE_ENV=PROD$'\n'LINK_EXPIRATION_TIME=120$'\n'EOF$'\n'\)$'\n'echo\ \"\$env_values\"\ \|\ sudo\ tee\ .env\ \>/dev/null$'\n'sudo\ chown\ csye6225:csye6225\ .env\ $'\n'echo\ \".env\ file\ created\"$'\n'$'\n' --maintenance-policy=MIGRATE --provisioning-model=STANDARD --service-account=service-account-webapp@csye6225-a03.iam.gserviceaccount.com --scopes=https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write --region=us-east4 --tags=web-instance --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=projects/debian-cloud/global/images/debian-12-bookworm-v20240312,kms-key=projects/csye6225-a03/locations/us-east4/keyRings/regional_keyring/cryptoKeys/vm_instance_key,mode=rw,size=10,type=pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+
+      - name: Configure Managed Instance Group to Use the New Template
+        run: gcloud compute instance-groups managed web-instance-$TEMPLATE_NAME webapp-instance-group-manage --template=$TEMPLATE_NAME --zone=us-east4-a
+
+      - name: Recreate Instances in Managed Instance Group
+        run: gcloud compute instance-groups managed recreate-instances web-instance-$TEMPLATE_NAME --region=us-east4 --zone=us-east4-a
+
+      # - name: Wait for Instance Group Refresh
+      #   run: 
+
+
 
 
