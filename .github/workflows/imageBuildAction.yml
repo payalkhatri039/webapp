@@ -71,14 +71,7 @@ jobs:
         run: gcloud compute instance-groups managed rolling-action replace webapp-instance-group-manager --max-unavailable=2 --region=us-east4  
 
       - name: Wait for Instance Group Refresh
-        run: |
-          while true; do
-            status=$(gcloud compute instance-groups managed describe webapp-instance-group-manager --region=us-east4 --format='value(status)')
-            if [[ $status == "READY" ]]; then
-              break
-            fi
-            sleep 30
-          done
+        run: gcloud compute instance-groups managed wait-until --stable webapp-instance-group-manager --region=us-east4 
 
 
 
