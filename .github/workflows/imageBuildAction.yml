@@ -75,8 +75,12 @@ jobs:
       - name: Recreate Instances in Managed Instance Group
         run: gcloud compute instance-groups managed rolling-action replace $MIG --max-unavailable=$MAX_INSTANCE_UNAVAILABLE --region=$REGION  
 
+      # - name: Wait for Instance Group Refresh
+      #   run: gcloud compute instance-groups managed wait-until --stable $MIG --region=$REGION
+
       - name: Wait for Instance Group Refresh
-        run: gcloud compute instance-groups managed wait-until --stable $MIG --region=$REGION
+        run: gcloud compute instance-groups managed wait-until --stable webapp-instance-group-manager --region=us-east4
+        
 
 
 
