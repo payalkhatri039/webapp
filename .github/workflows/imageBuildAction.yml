@@ -30,11 +30,13 @@ jobs:
       TEMPLATE_NAME: ${{vars.INSTANCE_TEMPLATE_NAME}}
       NETWORK_INTERFACE_TIER: ${{vars.NETWORK_INTERFACE_TIER}} 
       SUBNET: ${{vars.SUBNET}}
+      KEYRING_NAME: ${{vars.KEYRING_NAME}}
       MIG: ${{vars.MIG}}
       MIG_INSTANCE_TEMPLATE_PATH: ${{vars.MIG_INSTANCE_TEMPLATE_PATH}}
       MAX_INSTANCE_UNAVAILABLE: ${{vars.MAX_INSTANCE_UNAVAILABLE}}
       MACHINE_TYPE: ${{vars.MACHINE_TYPE}}
-
+      INSTANCE_DB_HOST: ${{ vars.INSTANCE_DB_HOST}}
+      INSTANCE_DB_PASSWORD: ${{vars.INSTANCE_DB_PASSWORD}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -65,7 +67,7 @@ jobs:
           packer init gcpBuild.pkr.hcl
          
       - name: Create new Instance Template version
-        run: gcloud compute instance-templates create $TEMPLATE_NAME --project=$PROJECT_ID --description=This\ template\ is\ used\ to\ create\ web\ instances\ depending\ on\ the\ load --machine-type=$MACHINE_TYPE --network-interface=network-tier=$NETWORK_INTERFACE_TIER,subnet=$SUBNET --instance-template-region=$REGION  --region=$REGION --metadata=startup-script=\#\!/bin/bash$'\n'$'\n'cd\ /home/Cloud/webapp/\ \|\|\ exit$'\n'$'\n'env_values=\$\(cat\ \<\<EOF$'\n'PORT=$PORT'\n'DB_NAME=$DB_NAME'\n'DB_USER=$DB_USER'\n'DB_PASSWORD=ewpnkOJ8KqVZlFiN$'\n'HOST=10.188.112.2$'\n'DIALECT=$DIALECT'\n'NODE_ENV=PROD$'\n'LINK_EXPIRATION_TIME=$LINK_EXPIRATION_TIME'\n'EOF$'\n'\)$'\n'echo\ \"\$env_values\"\ \|\ sudo\ tee\ .env\ \>/dev/null$'\n'sudo\ chown\ csye6225:csye6225\ .env\ $'\n'echo\ \".env\ file\ created\"$'\n'$'\n' --maintenance-policy=MIGRATE --provisioning-model=STANDARD --service-account=service-account-webapp@csye6225-a03.iam.gserviceaccount.com --scopes=https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write --tags=web-instance --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=csye6225-1712532924,kms-key=projects/csye6225-a03/locations/us-east4/keyRings/regional_keyring/cryptoKeys/vm_instance_key,mode=rw,size=100,type=pd-standard --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
+        run: gcloud compute instance-templates create $TEMPLATE_NAME --project=$PROJECT_ID --description=This\ template\ is\ used\ to\ create\ web\ instances\ depending\ on\ the\ load --machine-type=$MACHINE_TYPE --network-interface=network-tier=$NETWORK_INTERFACE_TIER,subnet=$SUBNET --instance-template-region=$REGION  --region=$REGION --metadata=startup-script=\#\!/bin/bash$'\n'$'\n'cd\ /home/Cloud/webapp/\ \|\|\ exit$'\n'$'\n'env_values=\$\(cat\ \<\<EOF$'\n'PORT=$PORT'\n'DB_NAME=$DB_NAME'\n'DB_USER=$DB_USER'\n'DB_PASSWORD=$INSTANCE_DB_PASSWORD'\n'HOST=$INSTANCE_DB_HOST'\n'DIALECT=$DIALECT'\n'NODE_ENV=PROD$'\n'LINK_EXPIRATION_TIME=$LINK_EXPIRATION_TIME'\n'EOF$'\n'\)$'\n'echo\ \"\$env_values\"\ \|\ sudo\ tee\ .env\ \>/dev/null$'\n'sudo\ chown\ csye6225:csye6225\ .env\ $'\n'echo\ \".env\ file\ created\"$'\n'$'\n' --maintenance-policy=MIGRATE --provisioning-model=STANDARD --service-account=service-account-webapp@csye6225-a03.iam.gserviceaccount.com --scopes=https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write --tags=web-instance --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=csye6225-1712532924,kms-key=projects/$PROJECT_ID/locations/$REGION/keyRings/$KEYRING_NAME/cryptoKeys/vm_instance_key,mode=rw,size=$DISK_SIZE,type=$DISK_TYPE --no-shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring --reservation-affinity=any
 
       - name: Configure Managed Instance Group to Use the New Template
         run:  gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION 
