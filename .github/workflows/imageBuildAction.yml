@@ -106,7 +106,7 @@ jobs:
         run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION
 
       - name: Recreate Instances in Managed Instance Group
-        run: gcloud compute instance-groups managed rolling-action start-update $MIG --version=template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION --replacement-method=substitue
+        run: gcloud compute instance-groups managed rolling-action start-update $MIG --version=template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION --replacement-method=substitute
 
       - name: Wait for Instance Group Refresh
         run: gcloud compute instance-groups managed wait-until --version-target-reached $MIG --region=$REGION
