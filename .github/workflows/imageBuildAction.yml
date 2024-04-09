@@ -68,7 +68,7 @@ jobs:
 
       - name: Create new Instance Template version
         run: |
-          gcloud compute instance-templates create testingtemplate9 \
+          gcloud compute instance-templates create testingtemplateten \
           --project=csye6225-a03 \
           --description="This template is used to create web instances depending on the load" \
           --machine-type=e2-standard-2 \
@@ -84,9 +84,9 @@ jobs:
           --no-shielded-secure-boot \
           --shielded-vtpm \
           --shielded-integrity-monitoring \
-          --reservation-affinity=any
+          --reservation-affinity=any \
           --metadata=startup-script="#/bin/bash
-            cd /home/Cloud/webapp/ || exit
+            cd /home/Cloud/webapp/ ||exit
             sudo tee -a .env <<EOF >/dev/null
             PORT=3001
             DB_NAME=webapp
