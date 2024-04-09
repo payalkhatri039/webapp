@@ -37,6 +37,7 @@ jobs:
       MACHINE_TYPE: ${{vars.MACHINE_TYPE}}
       INSTANCE_DB_HOST: ${{ vars.INSTANCE_DB_HOST}}
       INSTANCE_DB_PASSWORD: ${{vars.INSTANCE_DB_PASSWORD}}
+      VM_INSTANCE_KEY: ${{vars.VM_INSTANCE_KEY}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -68,19 +69,19 @@ jobs:
 
       - name: Create new Instance Template version
         run: |
-          gcloud compute instance-templates create testingtemplateten \
-          --project=csye6225-a03 \
+          gcloud compute instance-templates create $TEMPLATE_NAME \
+          --project=$PROJECT_ID \
           --description="This template is used to create web instances depending on the load" \
           --machine-type=e2-standard-2 \
-          --network-interface=network-tier=STANDARD,subnet=webapp \
-          --instance-template-region=us-east4 \
-          --region=us-east4 \
+          --network-interface=network-tier=$NETWORK_INTERFACE_TIER,subnet=$SUBNET \
+          --instance-template-region=$REGION \
+          --region=$REGION \
           --maintenance-policy=MIGRATE \
           --provisioning-model=STANDARD \
           --service-account=service-account-webapp@csye6225-a03.iam.gserviceaccount.com \
           --scopes=https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write \
           --tags=web-instance \
-          --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=csye6225-1712532924,kms-key=projects/csye6225-a03/locations/us-east4/keyRings/regional_keyring/cryptoKeys/vm_instance_key,mode=rw,size=100,type=pd-standard \
+          --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=csye6225-1712532924,kms-key=$VM_INSTANCE_KEY,mode=rw,size=$DISK_SIZE,type=$DISK_TYPE \
           --no-shielded-secure-boot \
           --shielded-vtpm \
           --shielded-integrity-monitoring \
@@ -88,21 +89,21 @@ jobs:
           --metadata=startup-script="#/bin/bash
             cd /home/Cloud/webapp/ ||exit
             sudo tee -a .env <<EOF >/dev/null
-            PORT=3001
-            DB_NAME=webapp
-            DB_USER=webapp
-            DB_PASSWORD=UAsaVuoaMkuzB02R
-            HOST=10.199.202.2
-            DIALECT=postgres
+            PORT=$PORT
+            DB_NAME=$DB_NAME
+            DB_USER=$DB_USER
+            DB_PASSWORD=$INSTANCE_DB_PASSWORD
+            HOST=$INSTANCE_DB_HOST
+            DIALECT=$DIALECT
             NODE_ENV=PROD
-            LINK_EXPIRATION_TIME=120
+            LINK_EXPIRATION_TIME=$LINK_EXPIRATION_TIME
             EOF
             sudo chown csye6225:csye6225 .env
             " \
-          --instance-template-region=us-east4
+          --instance-template-region=$REGION
 
       - name: Configure Managed Instance Group to Use the New Template
-        run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/testingtemplateten --region=$REGION
+        run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION
 
       - name: Recreate Instances in Managed Instance Group
         run: gcloud compute instance-groups managed rolling-action replace $MIG --region=$REGION --replacement-method=recreate --max-surge=0
