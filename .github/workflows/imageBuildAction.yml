@@ -66,9 +66,6 @@ jobs:
           cd vm-image/
           packer init gcpBuild.pkr.hcl
           IMAGE_ID=$(packer build -machine-readable gcpBuild.pkr.hcl | awk -F, '$0 ~/artifact,0,id/ {print $6}')
-
-      - name: Create new Instance Template version
-        run: |
           gcloud compute instance-templates create $TEMPLATE_NAME \
           --project=$PROJECT_ID \
           --description="This template is used to create web instances depending on the load" \
