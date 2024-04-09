@@ -76,4 +76,4 @@ jobs:
         run: gcloud compute instance-groups managed rolling-action replace $MIG --region=$REGION --replacement-method=recreate --max-surge=0
 
       - name: Wait for Instance Group Refresh
-        run: gcloud compute instance-groups managed wait-until --version-taget-reached $MIG --region=$REGION
+        run: gcloud compute instance-groups managed wait-until --version-target-reached $MIG --region=$REGION
