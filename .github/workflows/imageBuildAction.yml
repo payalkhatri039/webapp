@@ -66,13 +66,14 @@ jobs:
         run: |
           cd vm-image/
           packer init gcpBuild.pkr.hcl
+          IMAGE_ID=$(packer build -machine-readable gcpBuild.pkr.hcl | awk -F, '$0 ~/artifact,0,id/ {print $6}')
 
       - name: Create new Instance Template version
         run: |
           gcloud compute instance-templates create $TEMPLATE_NAME \
           --project=$PROJECT_ID \
           --description="This template is used to create web instances depending on the load" \
-          --machine-type=e2-standard-2 \
+          --machine-type=$MACHINE_TYPE \
           --network-interface=network-tier=$NETWORK_INTERFACE_TIER,subnet=$SUBNET \
           --instance-template-region=$REGION \
           --region=$REGION \
@@ -81,7 +82,7 @@ jobs:
           --service-account=service-account-webapp@csye6225-a03.iam.gserviceaccount.com \
           --scopes=https://www.googleapis.com/auth/pubsub,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write \
           --tags=web-instance \
-          --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=csye6225-1712532924,kms-key=$VM_INSTANCE_KEY,mode=rw,size=$DISK_SIZE,type=$DISK_TYPE \
+          --create-disk=auto-delete=yes,boot=yes,device-name=persistent-disk-0,image=$IMAGE_ID,kms-key=$VM_INSTANCE_KEY,mode=rw,size=$DISK_SIZE,type=$DISK_TYPE \
           --no-shielded-secure-boot \
           --shielded-vtpm \
           --shielded-integrity-monitoring \
