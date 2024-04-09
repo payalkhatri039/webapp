@@ -102,7 +102,7 @@ jobs:
           --instance-template-region=us-east4
 
       - name: Configure Managed Instance Group to Use the New Template
-        run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/testingtemplate9 --region=$REGION
+        run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/testingtemplateten --region=$REGION
 
       - name: Recreate Instances in Managed Instance Group
         run: gcloud compute instance-groups managed rolling-action replace $MIG --region=$REGION --replacement-method=recreate --max-surge=0
