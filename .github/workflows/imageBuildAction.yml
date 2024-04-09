@@ -68,7 +68,7 @@ jobs:
 
       - name: Create new Instance Template version
         run: |
-          gcloud compute instance-templates create testingtemplatesix \
+          gcloud compute instance-templates create testingtemplate9 \
           --project=csye6225-a03 \
           --description="This template is used to create web instances depending on the load" \
           --machine-type=e2-standard-2 \
@@ -85,33 +85,24 @@ jobs:
           --shielded-vtpm \
           --shielded-integrity-monitoring \
           --reservation-affinity=any
-          --metadata=startup-script="$(cat <<EOF
-          #!/bin/bash
-          
-          cd /home/Cloud/webapp/ || exit
-          
-          env_values=\$(cat <<EOF
-          PORT=3001
-          DB_NAME=webapp
-          DB_USER=webapp
-          DB_PASSWORD=UAsaVuoaMkuzB02R
-          HOST=10.199.202.2
-          DIALECT=postgres
-          NODE_ENV=PROD
-          LINK_EXPIRATION_TIME=120
-          EOF
-          )
-          echo "\$env_values" | sudo tee .env >/dev/null
-          sudo chown csye6225:csye6225 .env
-          echo ".env file created"
-          
-          EOF
-          )" \
-          --instance-template-region=us-east4 
-
+          --metadata=startup-script="#/bin/bash
+            cd /home/Cloud/webapp/ || exit
+            sudo tee -a .env <<EOF >/dev/null
+            PORT=3001
+            DB_NAME=webapp
+            DB_USER=webapp
+            DB_PASSWORD=UAsaVuoaMkuzB02R
+            HOST=10.199.202.2
+            DIALECT=postgres
+            NODE_ENV=PROD
+            LINK_EXPIRATION_TIME=120
+            EOF
+            sudo chown csye6225:csye6225 .env
+            " \
+          --instance-template-region=us-east4
 
       - name: Configure Managed Instance Group to Use the New Template
-        run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION
+        run: gcloud compute instance-groups managed set-instance-template $MIG --template=$MIG_INSTANCE_TEMPLATE_PATH/testingtemplate9 --region=$REGION
 
       - name: Recreate Instances in Managed Instance Group
         run: gcloud compute instance-groups managed rolling-action replace $MIG --region=$REGION --replacement-method=recreate --max-surge=0
