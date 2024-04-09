@@ -26,7 +26,7 @@ jobs:
       SOURCE_IMAGE_FAMILY: ${{ vars.SOURCE_IMAGE_FAMILY }}
       SSH_USERNAME: ${{ secrets.SSH_USERNAME }}
       DISK_SIZE: ${{ vars.DISK_SIZE}}
-      DISK_TYPE: ${{ vars.DISK_TYPE }}8
+      DISK_TYPE: ${{ vars.DISK_TYPE }}
       TEMPLATE_NAME: ${{vars.INSTANCE_TEMPLATE_NAME}}
       NETWORK_INTERFACE_TIER: ${{vars.NETWORK_INTERFACE_TIER}}
       SUBNET: ${{vars.SUBNET}}
