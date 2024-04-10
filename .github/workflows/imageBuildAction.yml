@@ -106,4 +106,4 @@ jobs:
         run: gcloud compute instance-groups managed rolling-action start-update $MIG --version=template=$MIG_INSTANCE_TEMPLATE_PATH/$TEMPLATE_NAME --region=$REGION --replacement-method=substitute
 
       - name: Wait for Instance Group Refresh
-        run: gcloud compute instance-groups managed wait-until --version-target-reached $MIG --region=$REGION
+        run: gcloud compute instance-groups managed wait-until --stable $MIG --region=$REGION --timeout=1800
