@@ -1,13 +1,12 @@
 import { PubSub } from "@google-cloud/pubsub";
 import logger from "../modules/winstonLogger.js";
-import { version } from "winston";
 // Create an instance of PubSub with the provided service account key
 const pubSubClient = new PubSub({
   projectId: "csye6225-a03",
 });
 
 export const publishMessage = async (topicName, payload) => {
-  const userData = { ...payload, version: "v2" };
+  const userData = { ...payload, version: "v1" };
 
   const dataBuffer = Buffer.from(JSON.stringify(userData));
   try {
