@@ -1,4 +1,4 @@
-CSYE-6225-Assignment-5
+# Web Application
 
 
 # Reference links:
@@ -11,11 +11,11 @@ CSYE-6225-Assignment-5
 6. https://github.com/github/gitignore/blob/main/Packer.gitignore
 7. https://docs.github.com/en/actions/security-guides/using-secrets-in-github-actions
 
-# API Checks Covered:
+# API Checks Covered For Healthz:
 
 1. No query params accepted.
 2. No Request method except Get accepted for healthz.
-3. No request method except Get, Post and Put for user aps
+3. No request method except Get, Post and Put for user APIs.
 4. No payloads accepted in requests and responses for healthz.
 5. Only authorized users can perform Get and Put operations.
 6. Allowing only valid JSON schemas for user APIs.
@@ -28,16 +28,21 @@ CSYE-6225-Assignment-5
 # Git Action
 
 1. Integration tests are run at pull request and merge request
-2. Image is built on the runner after pull request is merged
-3. Artifact copied to the image are built from the Github repo
+2. Packer is initialized and validated. Artifact for the image are built from the Github repository
+3. Machine image is built on the runner after pull request is merged
+
 
 # Command to run locally :
 
+npm install
 npm start
 
 # Hit API on Postman
 
-On the external IP address of the Virtual Instance
+1. For Healthz: https://payalkhatri.me/healthz
+2. For User Post: https://payalkhatri.me/v1/user
+3. For User Get/Put: https://payalkhatri.me/v1/user/self
+
 
 # IAM Service account has roles:
 
