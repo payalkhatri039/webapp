@@ -1,5 +1,4 @@
-CSYE-6225-Assignment-5
-
+# CloudVerify Engine - Web Application
 
 # Reference links:
 
